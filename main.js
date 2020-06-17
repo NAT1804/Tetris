@@ -4,8 +4,8 @@ class Game {
 		this.boardWidth = 10;
 		this.boardHeight = 23;
 		this.currentBoard = new Array(this.boardHeight).fill(0).map(() => new Array(this.boardWidth).fill(0));
-		this.currentBoard = new Array(this.boardHeight).fill(0).map(() => new Array(this.boardWidth).fill(0));
-		this.currentTetromino = null;
+		this.landedBoard = new Array(this.boardHeight).fill(0).map(() => new Array(this.boardWidth).fill(0));
+		this.currentTetromino = this.randomTetromina();
 
 		this.canvas = document.getElementById('tetris-canvas');
 		this.ctx = this.canvas.getContext('2d');
@@ -38,6 +38,56 @@ class Game {
 		this.ctx.fillText('ĐIỂM SỐ:', 300, 200);
 		this.ctx.fillText(this.score.toString(), 300, 230);
 	}
+
+	randomTetromina() {
+		const randNum = Math.floor(Math.random()*Math.floor(7));
+		switch(randNum) {
+			case 0:
+				return new LShape(1,4);
+			case 1: 
+				return new JShape(1, 4);
+			case 2:
+				return new OShape(2, 4);
+			case 3:
+				return new TShape(2, 4);
+			case 4:
+				return new SShape(2, 4)
+			case 5:
+				return new ZShape(2, 4)
+			case 6:
+				return new IShape(0, 4)
+		}
+	}
+
+	play() {
+		setInterval(() => {
+			this.progress();
+			this.updateCurrentBoard();
+			this.draw();
+		}, 800);
+	}
+
+	progress() {
+		this.currentTetromino.fall();
+	}
+
+	updateCurrentBoard() {
+		for (let i=0; i<this.boardHeight; ++i) {
+			for (let j=0; j<this.boardWidth; ++j) {
+				this.currentBoard[i][j] = this.landedBoard[i][j];
+			}
+		}
+
+		for (let i = 0; i < this.currentTetromino.height; i++) {
+			for (let j = 0; j < this.currentTetromino.width; j++) {
+				if (this.currentTetromino.shape[i][j] > 0) {
+				this.currentBoard[this.currentTetromino.row + i][this.currentTetromino.col + j] = this.currentTetromino.shape[i][j]
+				}
+			}
+		}
+
+	}
+
 }
 
 class Tetromino {
@@ -52,11 +102,11 @@ class Tetromino {
     }
 
     get shape() {
-        return this.contructor.shapes[this.angle];
+        return this.constructor.shapes[this.angle];
     }
     
     get width() {
-        return this.contructor.shape[0].length;
+        return this.shape[0].length;
     }
 
     get height() {
@@ -87,137 +137,202 @@ class Tetromino {
 
 class LShape extends Tetromino {}
 
-LShape.shapes =
-  [[[1, 0],
+LShape.shapes = [
+  [
     [1, 0],
-    [1, 1]],
- 
-   [[1, 1, 1],
-    [1, 0, 0]],
- 
-   [[1, 1],
+    [1, 0],
+    [1, 1]
+  ],
+
+  [
+    [1, 1, 1],
+    [1, 0, 0]
+  ],
+
+  [
+    [1, 1],
     [0, 1],
-    [0, 1]],
- 
-   [[0, 0, 1],
-    [1, 1, 1]]]
+    [0, 1]
+  ],
 
-LShape.color = 'rgb(255, 87, 34)'
+  [
+    [0, 0, 1],
+    [1, 1, 1]
+  ]
+]
 
-class JShape extends Tetromino { }
- 
-JShape.shapes =
-  [[[0, 2],
+LShape.color = 'rgb(255, 87, 34)';
+
+class JShape extends Tetromino {}
+
+JShape.shapes = [
+  [
     [0, 2],
-    [2, 2]],
- 
-   [[2, 0, 0],
-    [2, 2, 2]],
- 
-   [[2, 2],
+    [0, 2],
+    [2, 2]
+  ],
+
+  [
+    [2, 0, 0],
+    [2, 2, 2]
+  ],
+
+  [
+    [2, 2],
     [2, 0],
-    [2, 0]],
- 
-   [[2, 2, 2],
-    [0, 0, 2]]]
- 
-JShape.color = 'rgb(63, 81, 181)'
- 
-class OShape extends Tetromino { }
- 
-OShape.shapes =
-  [[[3, 3],
-    [3, 3]],
- 
-   [[3, 3],
-    [3, 3]],
- 
-   [[3, 3],
-    [3, 3]],
- 
-   [[3, 3],
-    [3, 3]]]
- 
-OShape.color = 'rgb(255, 235, 59)'
- 
-class TShape extends Tetromino { }
- 
-TShape.shapes =
-  [[[0, 4, 0],
-    [4, 4, 4]],
- 
-   [[4, 0],
+    [2, 0]
+  ],
+
+  [
+    [2, 2, 2],
+    [0, 0, 2]
+  ]
+]
+
+JShape.color = 'rgb(63, 81, 181)';
+
+class OShape extends Tetromino {}
+
+OShape.shapes = [
+  [
+    [3, 3],
+    [3, 3]
+  ],
+
+  [
+    [3, 3],
+    [3, 3]
+  ],
+
+  [
+    [3, 3],
+    [3, 3]
+  ],
+
+  [
+    [3, 3],
+    [3, 3]
+  ]
+]
+
+OShape.color = 'rgb(255, 235, 59)';
+
+class TShape extends Tetromino {}
+
+TShape.shapes = [
+  [
+    [0, 4, 0],
+    [4, 4, 4]
+  ],
+
+  [
+    [4, 0],
     [4, 4],
-    [4, 0]],
- 
-   [[4, 4, 4],
-    [0, 4, 0]],
- 
-   [[0, 4],
+    [4, 0]
+  ],
+
+  [
+    [4, 4, 4],
+    [0, 4, 0]
+  ],
+
+  [
+    [0, 4],
     [4, 4],
-    [0, 4]]]
- 
-TShape.color = 'rgb(156, 39, 176)'
- 
-class SShape extends Tetromino { }
- 
-SShape.shapes =
-  [[[0, 5, 5],
-    [5, 5, 0]],
- 
-   [[5, 0],
+    [0, 4]
+  ]
+]
+
+TShape.color = 'rgb(156, 39, 176)';
+
+class SShape extends Tetromino {}
+
+SShape.shapes = [
+  [
+    [0, 5, 5],
+    [5, 5, 0]
+  ],
+
+  [
+    [5, 0],
     [5, 5],
-    [0, 5]],
- 
-   [[0, 5, 5],
-    [5, 5, 0]],
- 
-   [[5, 0],
+    [0, 5]
+  ],
+
+  [
+    [0, 5, 5],
+    [5, 5, 0]
+  ],
+
+  [
+    [5, 0],
     [5, 5],
-    [0, 5]]]
- 
-SShape.color = 'rgb(76, 175, 80)'
- 
-class ZShape extends Tetromino { }
- 
-ZShape.shapes =
-  [[[6, 6, 0],
-    [0, 6, 6]],
- 
-   [[0, 6],
+    [0, 5]
+  ]
+]
+
+SShape.color = 'rgb(76, 175, 80)';
+
+class ZShape extends Tetromino {}
+
+ZShape.shapes = [
+  [
+    [6, 6, 0],
+    [0, 6, 6]
+  ],
+
+  [
+    [0, 6],
     [6, 6],
-    [6, 0]],
- 
-   [[6, 6, 0],
-    [0, 6, 6]],
- 
-   [[0, 6],
+    [6, 0]
+  ],
+
+  [
+    [6, 6, 0],
+    [0, 6, 6]
+  ],
+
+  [
+    [0, 6],
     [6, 6],
-    [6, 0]]]
- 
-ZShape.color = 'rgb(183, 28, 28)'
- 
-class IShape extends Tetromino { }
- 
-IShape.shapes =
-  [[[7],
+    [6, 0]
+  ]
+]
+
+ZShape.color = 'rgb(183, 28, 28)';
+
+class IShape extends Tetromino {}
+
+IShape.shapes = [
+  [
     [7],
     [7],
-    [7]],
- 
-   [[7, 7, 7, 7]],
- 
-   [[7],
+    [7],
+    [7]
+  ],
+
+  [
+    [7, 7, 7, 7]
+  ],
+
+  [
     [7],
     [7],
-    [7]],
- 
-   [[7, 7, 7, 7]]]
- 
-IShape.color = 'rgb(0, 188, 212)'
+    [7],
+    [7]
+  ],
+
+  [
+    [7, 7, 7, 7]
+  ]
+]
+
+IShape.color = 'rgb(0, 188, 212)';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const game = new Game();
+	game.updateCurrentBoard();
 	game.draw();
+	game.play();
 })
 
